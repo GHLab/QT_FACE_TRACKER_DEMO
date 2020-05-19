@@ -43,6 +43,7 @@ private:
     std::shared_ptr<FACETRACKER::Tracker> m_trackerPtr;
     cv::Mat m_tri;
     cv::Mat m_con;
+    cv::Mat m_pose;
 
     bool m_trackingFailed = false, m_fcheck = false;
     std::vector<int> m_wSize1;

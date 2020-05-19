@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_trackerPtr = std::make_shared<FACETRACKER::Tracker>(targetModelFilePath.toStdString().c_str());
 
+    m_pose = m_trackerPtr->_clm._pglobl;
+
     m_tri = FACETRACKER::IO::LoadTri(targetTriFilePath.toStdString().c_str());
     m_con = FACETRACKER::IO::LoadCon(targetConFilePath.toStdString().c_str());
 
@@ -58,10 +60,12 @@ void MainWindow::updateWindow()
 
     cv::flip(m_frame, m_frame, 1);
 
-    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+
 
     cv::Mat gray;
     cv::cvtColor(m_frame, gray, CV_BGRA2GRAY);
+
+    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 
     std::vector<int> wSize = m_trackingFailed ? m_wSize2 : m_wSize1;
 
@@ -161,4 +165,23 @@ void MainWindow::__draw(cv::Mat &image,cv::Mat &shape,cv::Mat &con,cv::Mat &tri,
 
         cv::circle(image,p1,2,c);
     }
+
+    double pitch = m_pose.at<double>(1, 0) * 180 / 3.14;
+    double yaw = m_pose.at<double>(2, 0) * 180 / 3.14;
+    double roll = m_pose.at<double>(3, 0) * 180 / 3.14;
+
+    QString strYaw("yaw : %1");
+    strYaw = strYaw.arg(yaw);
+
+    QString strPitch("pitch : %1");
+    strPitch = strPitch.arg(pitch);
+
+    QString strRoll("roll : %1");
+    strRoll = strRoll.arg(roll);
+
+    cv::putText(image, strYaw.toStdString().c_str(), cv::Point(10, 50), CV_FONT_HERSHEY_DUPLEX, 1, CV_RGB(0,255,0), 2);
+    cv::putText(image, strPitch.toStdString().c_str(), cv::Point(10, 100), CV_FONT_HERSHEY_DUPLEX, 1, CV_RGB(0,255,0), 2);
+    cv::putText(image, strRoll.toStdString().c_str(), cv::Point(10, 150), CV_FONT_HERSHEY_DUPLEX, 1, CV_RGB(0,255,0), 2);
+
+    cv::rectangle(image, m_trackerPtr->_rect, CV_RGB(0, 0, 255), 1);
 }
