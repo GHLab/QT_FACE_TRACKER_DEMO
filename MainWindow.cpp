@@ -56,12 +56,9 @@ void MainWindow::updateWindow()
 {
     m_cap >> m_frame;
 
-    const int labelWidth = ui->label->width();
-    const int labelHeight = ui->label->height();
-
-    //cv::resize(m_frame, m_frame, Size(labelWidth, labelHeight));
-
     cv::flip(m_frame, m_frame, 1);
+
+    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 
     cv::Mat gray;
     cv::cvtColor(m_frame, gray, CV_BGRA2GRAY);
@@ -81,6 +78,9 @@ void MainWindow::updateWindow()
         m_trackingFailed = true;
     }
 
+    std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+    qDebug() << "FaceTracker duration : " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms";
+
     cv::cvtColor(m_frame, m_frame, CV_BGRA2RGBA);
 
     QImage qImg((const unsigned char*) m_frame.data, m_frame.cols, m_frame.rows, QImage::Format_RGBA8888);
@@ -90,7 +90,12 @@ void MainWindow::updateWindow()
 
 void MainWindow::__startCapture(void)
 {
+    const int labelWidth = ui->label->width();
+    const int labelHeight = ui->label->height();
+
     m_cap.open(0);
+    m_cap.set(CAP_PROP_FRAME_WIDTH, labelWidth);
+    m_cap.set(CAP_PROP_FRAME_HEIGHT, labelHeight);
 
     if (!m_cap.isOpened())
         return;
@@ -152,6 +157,8 @@ void MainWindow::__draw(cv::Mat &image,cv::Mat &shape,cv::Mat &con,cv::Mat &tri,
 
         p1 = cv::Point(shape.at<double>(i,0),shape.at<double>(i+n,0));
 
-        c = CV_RGB(255,0,0); cv::circle(image,p1,2,c);
+        c = CV_RGB(255,0,0);
+
+        cv::circle(image,p1,2,c);
     }
 }

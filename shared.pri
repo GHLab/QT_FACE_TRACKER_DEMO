@@ -15,7 +15,7 @@ darwin {
         "    <key>CFBundleExecutable</key>" \
         "    <string>$$TARGET</string>" \
         "    <key>CFBundleIdentifier</key>" \
-        "    <string>com.linecorp.$$TARGET</string>" \
+        "    <string>com.ghlab.$$TARGET</string>" \
         "    <key>CFBundleDisplayName</key>" \
         "    <string>$$TARGET</string>" \
         "    <key>CFBundleName</key>" \
