@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>model/face.con</file>
+        <file>model/face.tracker</file>
+        <file>model/face.tri</file>
+        <file>model/face2.tracker</file>
+    </qresource>
+</RCC>
