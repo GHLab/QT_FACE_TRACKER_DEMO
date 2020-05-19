@@ -60,8 +60,6 @@ void MainWindow::updateWindow()
 
     cv::flip(m_frame, m_frame, 1);
 
-
-
     cv::Mat gray;
     cv::cvtColor(m_frame, gray, CV_BGRA2GRAY);
 
@@ -69,7 +67,7 @@ void MainWindow::updateWindow()
 
     std::vector<int> wSize = m_trackingFailed ? m_wSize2 : m_wSize1;
 
-    if (m_trackerPtr->Track(gray, wSize, -1, m_nIter, m_clamp, m_fTol, m_fcheck) == 0)
+    if (m_trackerPtr->Track(gray, wSize, -1, m_nIter, m_clamp, m_fTol, true) == 0)
     {
         int idx = m_trackerPtr->_clm.GetViewIdx();
         m_trackingFailed = false;
@@ -183,5 +181,57 @@ void MainWindow::__draw(cv::Mat &image,cv::Mat &shape,cv::Mat &con,cv::Mat &tri,
     cv::putText(image, strPitch.toStdString().c_str(), cv::Point(10, 100), CV_FONT_HERSHEY_DUPLEX, 1, CV_RGB(0,255,0), 2);
     cv::putText(image, strRoll.toStdString().c_str(), cv::Point(10, 150), CV_FONT_HERSHEY_DUPLEX, 1, CV_RGB(0,255,0), 2);
 
-    cv::rectangle(image, m_trackerPtr->_rect, CV_RGB(0, 0, 255), 1);
+    double top, left, bottom, right;
+
+    if (shape.at<double>(0, 0) < 20.5)
+    {
+        if (shape.at<double>(0, 0) < 0)
+            left = 0;
+        else
+            left = shape.at<double>(0, 0);
+    }
+    else
+    {
+        left = shape.at<double>(0, 0) - 20;
+    }
+
+    if (shape.at<double>(16, 0) + 20 > image.cols - 0.5)
+    {
+        if (shape.at<double>(16,0) > image.cols)
+            right = image.cols;
+        else
+            right = shape.at<double>(16, 0);
+    }
+    else
+    {
+        right = shape.at<double>(16, 0) + 20;
+    }
+
+    if (shape.at<double>(8 + n, 0) > image.rows - 0.5)
+    {
+        if (shape.at<double>(8 + n, 0) > image.rows)
+            bottom = image.rows;
+        else
+            bottom = shape.at<double>(8 + n, 0);
+    }
+    else
+    {
+        bottom = shape.at<double>(8 + n, 0) + 20;
+    }
+
+    if (shape.at<double>(19 + n, 0) < 10.5)
+    {
+        if (shape.at<double>(19 + n, 0) < 0)
+            top = 0;
+        else
+            top = shape.at<double>(19 + n, 0);
+    }
+    else
+    {
+        top = shape.at<double>(19 + n, 0) - 10;
+    }
+
+    cv::Rect faceRect(cv::Point(left, top), cv::Point(right, bottom));
+
+    cv::rectangle(image, faceRect, CV_RGB(0, 0, 255), 1);
 }
